@@ -1,0 +1,143 @@
+#include <vector>
+#include <string>
+#include <memory>
+ 
+using namespace std;  // This allows you to avoid using 'std::' before standard library names
+ 
+// Class to represent a menu item
+class MenuItem {
+public:
+    string name;
+    vector<shared_ptr<MenuItem>> subMenu;
+ 
+    MenuItem(const string& name) : name(name) {}
+ 
+    void addSubMenu(shared_ptr<MenuItem> item) {
+        subMenu.push_back(item);
+    }
+ 
+    void displayMenu(int level = 0) const {
+        cout << string(level * 2, ' ') << name << endl;
+        for (const auto& item : subMenu) {
+            item->displayMenu(level + 1);
+        }
+    }
+};
+ 
+// Class to represent the menu navigation system
+class MenuSystem {
+private:
+    shared_ptr<MenuItem> currentMenu;
+    shared_ptr<MenuItem> rootMenu;
+ 
+public:
+    MenuSystem() {
+        rootMenu = make_shared<MenuItem>("Main Menu");
+ 
+        auto settings = make_shared<MenuItem>("Settings");
+        auto displaySettings = make_shared<MenuItem>("Display Settings");
+        auto audioSettings = make_shared<MenuItem>("Audio Settings");
+ 
+        settings->addSubMenu(displaySettings);
+        settings->addSubMenu(audioSettings);
+ 
+        auto media = make_shared<MenuItem>("Media");
+        auto radio = make_shared<MenuItem>("Radio");
+        auto bluetoothAudio = make_shared<MenuItem>("Bluetooth Audio");
+ 
+        media->addSubMenu(radio);
+        media->addSubMenu(bluetoothAudio);
+ 
+        rootMenu->addSubMenu(settings);
+        rootMenu->addSubMenu(media);
+ 
+        currentMenu = rootMenu;
+    }
+ 
+    // Function to navigate the menu system
+    void navigate() {
+        bool running = true;
+        while (running) {
+            displayCurrentMenu();
+            int choice = getUserChoice();
+ 
+            switch (choice) {
+                case 1: // Navigate down (enter sub-menu)
+                    enterSubMenu();
+                    break;
+                case 2: // Navigate up (back to parent menu)
+                    navigateUp();
+                    break;
+                case 3: // Enter the selected item
+                    enterMenuItem();
+                    break;
+                case 0: // Exit
+                    running = false;
+                    break;
+                default:
+                    cout << "Invalid choice! Please try again.\n";
+                    break;
+            }
+        }
+    }
+ 
+private:
+    void displayCurrentMenu() {
+        cout << "\nCurrent Menu:\n";
+        currentMenu->displayMenu();
+        cout << "\nOptions:\n";
+        cout << "1. Navigate Down (Enter Submenu)\n";
+        cout << "2. Navigate Up (Back to Parent)\n";
+        cout << "3. Enter Menu Item\n";
+        cout << "0. Exit\n";
+    }
+ 
+    int getUserChoice() {
+        int choice;
+        cout << "Enter your choice: ";
+        cin >> choice;
+        return choice;
+    }
+ 
+    void enterSubMenu() {
+        if (currentMenu->subMenu.empty()) {
+            cout << "No sub-menu available!\n";
+            return;
+        }
+        cout << "Select a submenu:\n";
+        for (size_t i = 0; i < currentMenu->subMenu.size(); ++i) {
+            cout << i + 1 << ". " << currentMenu->subMenu[i]->name << endl;
+        }
+ 
+        int choice;
+        cout << "Enter submenu choice: ";
+        cin >> choice;
+        if (choice >= 1 && choice <= currentMenu->subMenu.size()) {
+            currentMenu = currentMenu->subMenu[choice - 1];
+        } else {
+            cout << "Invalid choice! Returning to the previous menu.\n";
+        }
+    }
+ 
+    void navigateUp() {
+        // To navigate up, we need to keep track of the parent menu
+        cout << "This feature is not fully implemented in this basic version.\n";
+    }
+ 
+    void enterMenuItem() {
+        cout << "You have entered: " << currentMenu->name << endl;
+        // We can add specific logic for each menu item here if necessary
+    }
+};
+ 
+int main() {
+    MenuSystem menuSystem;
+    menuSystem.navigate();
+ 
+    return 0;
+}
+
+has context menu
+
+
+has context menu
